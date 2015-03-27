@@ -9,10 +9,21 @@
 #include <stdio.h>
 
 //Structure d'état
-typedef struct etat{
+typedef struct Etat{
 	char e; //état de la clause
-	struct etat *suivant; //pointeur sur état suivant
-}etat;
+	struct Etat *suivant; //pointeur sur état suivant
+}Etat;
+
+//Structure d'une élément d'une liste chainée d'entiers
+typedef struct Entier{
+	int id;
+	struct Entier *suivant;
+}Entier;
+
+//Structure de Littéraux 
+typedef struct Litteral{
+	Entier* tete;
+}Litteral;
 
 #endif
 

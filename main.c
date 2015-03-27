@@ -4,12 +4,15 @@
  * */
  
 #include "main.h"
+#include "ges_fichiers.h"
 
 //Fonction main
 int main(int argc,char** argv)
 {
 	//Déclaration de variables
 	int choix=0,quitter=0;
+	int nbClauses=0,nbLitt=0;
+	Litteral *tabLitt=NULL;
 	
 	//Boucle principale du programme
 	while(!quitter)
@@ -19,8 +22,8 @@ int main(int argc,char** argv)
 		printf("1.Solveur largeur d'abord\n");
 		printf("2.Solveur profondeur d'abord\n");
 		printf("3.Solveur A* \n");
-		printf("4.Quitter");
-		printf("1, 2, 3, ou 4");
+		printf("4.Quitter\n");
+		printf("1, 2, 3, ou 4\n");
 		scanf("%d",&choix);
 		
 		//Choix d'une tache
