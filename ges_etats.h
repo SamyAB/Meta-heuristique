@@ -3,6 +3,7 @@
 
 void afficherEtat(Etat *tab,int nbClauses);
 Litteral *init(char *benchmark,int *nbClauses,int *nbLitteraux,Etat **tab);
+void AjouterAOpen(Open **tete,Etat *etat);
 
 
 #endif

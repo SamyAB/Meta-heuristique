@@ -25,6 +25,12 @@ typedef struct Litteral{
 	Entier* tete;
 }Litteral;
 
+//Structure d'OPEN
+typedef struct Open{
+	Etat *e;
+	struct Open *suivant;
+}Open;
+
 #endif
 
 
