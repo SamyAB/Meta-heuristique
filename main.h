@@ -14,12 +14,6 @@ typedef struct Entier{
 	struct Entier *suivant;
 }Entier;
 
-//Structure d'un élément d'une liste chainée de caractères
-/*typeDef struct Char{
-	char c;
-	struct Char suivant;
-}Char;*/
-
 //Structure de Littéraux 
 typedef struct Litteral{
 	Entier* tete;
@@ -27,11 +21,13 @@ typedef struct Litteral{
 
 //Structure d'OPEN
 typedef struct Open{
-	int nbClauses;
 	char *e;
 	Entier *chemin;
 	struct Open *suivant;
 }Open;
+
+//Déclarationde la taille des tables e de la structure Open
+int taille;
 
 #endif
 

@@ -8,8 +8,8 @@ void afficherEtat(char *tab,int nbClauses);
 void ajoutChemin(Entier **tete,int val);
 int compteurNiveau(Entier *tete);
 
-Litteral *init(char *benchmark,int *nbClauses,int *nbLitteraux,char **tab);
-void AjouterAOpen(Open **tete,char *etat,int nbClauses);
+Litteral *init(char *benchmark,int *nbClauses,int *nbLitteraux,Open **etatInit);
+void ajouterAOpen(Open **tete,char *etat,int nbClauses);
 
 Open *depiler(Open **tete);
 char typeEtat(Open *etat);

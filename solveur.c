@@ -14,7 +14,7 @@ void largeur()
 	int nbClauses=0,nbLitt=0,niveau=0;
 	Open *etatInitial=NULL,*etatActuel=NULL;
 	Open *tete=NULL;
-	char typeE='';
+	char typeE=' ';
 	
 	//Initialisation des données
 	tabLitt=init("test.cnf",&nbClauses,&nbLitt,&etatInitial);
@@ -34,14 +34,16 @@ void largeur()
 		//Test si l'état actuel est un état final (SAT)
 		if(typeE=='S')
 		{
-			typeE='';
+			typeE=' ';
+			printf("la formule est SAT\n");
+			afficherChemin(etatActuel->chemin);
 			break;
 		}
 		
 		//Test si l'état est faux (UNSAT)
 		if(typeE=='U')
 		{
-			typeE='';
+			typeE=' ';
 			continue;
 		}
 		

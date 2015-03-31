@@ -4,6 +4,7 @@
  
 #include "main.h"
 #include "ges_fichiers.h"
+#include <string.h>
 
 //Fonction d'affichage de chemin
 void afficherChemin(Entier *tete)
@@ -32,14 +33,15 @@ void afficherEtat(Open *etat)
 {
 	//Déclaration de variables
 	int i=0;
+	extern int taille;
 	
 	//Affichage du chemin menant a cet état 
-	afficherChemin(etat->chemin)
+	afficherChemin(etat->chemin);
 	
 	//Parcours de l'état
-	for(i=0;i<nbClauses;i++)
+	for(i=0;i<taille;i++)
 	{
-		printf("la clause %d à l'état: %c\n",i+1,tab[i]);
+		printf("la clause %d à l'état: %c\n",i+1,(etat->e)[i]);
 	}
 }
 
@@ -92,21 +94,25 @@ Litteral* init(char *benchmark,int *nbClauses,int *nbLitt,Open **etatInit)
 	//Déclarationd de variables 
 	Litteral *tab=NULL;
 	int i=0;
+	extern int taille;//variable globale taille de table de clauses
 	
 	//Lecteur du fichier de benchmark
 	tab=lectureDeFichier(benchmark,nbClauses,nbLitt);
+	
+	//Affectation du nombre de clauses de l'état initial à taille 
+	taille=*nbClauses;
 	
 	//Allocation de l'état initial
 	*etatInit=(Open*)malloc(sizeof(Open));
 	if(*etatInit==NULL)
 	{
-		fprintf(stderr,"erreur lors de l'allocationd e l'état initial\n";
+		fprintf(stderr,"erreur lors de l'allocationd e l'état initial\n");
 		exit(EXIT_FAILURE);
 	}
 	
 	//Allocation de la table d'états de clauses de l'état initial
 	(*etatInit)->e=(char*)malloc(*nbClauses*sizeof(char));
-	if((*tabInit)->e==NULL)
+	if((*etatInit)->e==NULL)
 	{
 		fprintf(stderr,"erreur lors de l'alocation de la table d'états\n");
 		exit(EXIT_FAILURE);
@@ -120,7 +126,7 @@ Litteral* init(char *benchmark,int *nbClauses,int *nbLitt,Open **etatInit)
 	
 	//Initialisation du chemin qui a mené a l'état
 	//l'état initial ne vient de nulle part
-	*etatInit->chemin=NULL;
+	(*etatInit)->chemin=NULL;
 	
 	return tab;
 }
@@ -129,7 +135,7 @@ Litteral* init(char *benchmark,int *nbClauses,int *nbLitt,Open **etatInit)
 void AjouterAOpen(Open **tete,Open *etat)
 {
 	//Déclaration de varaibles
-	Open *tmp=NULL,Open *tmp2=NULL;
+	Open *tmp=NULL,*tmp2=NULL;
 	
 	//Si la tete est vide
 	if(*tete==NULL)
@@ -177,46 +183,93 @@ char typeEtat(Open *etat)
 {
 	//Déclaration de vairables
 	int i=0;
-	
-	//Si le nombre de clauses est nul la formule dans cet état est SAT
-	if(etat->nbClauses==0)
-	{
-		return 'S';
-	}
+	char type='S';
+	extern int taille;
 	
 	//parcourt de l'état
-	for(i=0;i<(etat->nbClauses);i++)
+	for(i=0;i<taille;i++)
 	{
 		//Si une seule clause est fausse l'état est UNSAT
 		if((etat->e)[i]=='U') return 'U';
+		
+		//Si une clause n'est pas encore SAT et n'est pas UNSAT
+		if((etat->e)[i]!='S') type=' ';
 	}
 	
-	return '';
+	return type;
 }
 
 //Fonction de génération d'un état fils selon la variable val
 Open *genererEtat(Open *etatP,int val,Litteral *tabLitt,int nbLitt)
 {
 	//Déclaration de variable
-	int litteral=-1;
+	int litteral=0,id=0;
 	Open *etat=NULL;
+	extern int taille;
+	char *tableau=NULL;
+	Entier *tmp=NULL;
 	
 	//Compter le niveau, et donc le littéral auquel on affecte la valeur
 	litteral=compteurNiveau(etatP->chemin);
+		
+	//Copie de la table d'état de l'état père dans tableau	
+	tableau=strdup(etatP->e);
 	
+	//Affectation des nouveaux états dans la table d'états 
+	tmp=tabLitt[litteral].tete;
+	while(tmp!=NULL)
+	{
+		id=tmp->id;
+		
+		if((id*val)>0)
+		{
+			tableau[abs(id)]='S';
+		}
+		else
+		{
+			switch(tableau[abs(tmp->id)])
+			{
+				case '0':
+					tableau[tmp->id]='1';
+					break;
+				case '1':
+					tableau[tmp->id]='2';
+					break;
+				case '2':
+					tableau[tmp->id]='U';
+					break;
+			}
+		}
+		tmp=tmp->suivant;
+	}
 	
+	//Allocation du nouvel état
+	etat=(Open*)malloc(sizeof(Open));
+	if(etat==NULL)
+	{
+		fprintf(stderr,"erreur lors de l'allocation du nouvel état\n");
+		exit(EXIT_FAILURE);
+	}
+	
+	//Affectation des valeurs au nouvel état
+	ajoutChemin(&(etat->chemin),(litteral+1)*val);
+	etat->e=tableau;
+	etat->suivant=NULL;
+	
+	return etat;
 }
 
 //Fonction de libération de liste d'entier
 void libererEntier(Entier **tete)
 {
 	//Déclaration de variables
-	Eniter *tmp=NULL;
+	Entier *tmp=NULL;
 	
 	while(*tete!=NULL)
 	{
-		tmp=(*tete)->suivant;
-		free(*tete);
+		tmp=(*tete);
+		(*tete)=tmp->suivant;
+		free(tmp);
 		*tete=tmp;
 	}
 }
@@ -224,10 +277,13 @@ void libererEntier(Entier **tete)
 //Fonction de libération de l'espace mémoire qu'occupe un état
 void liberer(Open **etat)
 {
+	Open *tmp=(*etat);
+	
 	if(*etat!=NULL)
 	{
-		libererEntier(&((*etat)->chemin));
-		free((*etat)->e);
-		free(*etat);
+		libererEntier(&(tmp->chemin));
+		free(tmp->e);
+		free(tmp);
+		(*etat)=NULL;
 	}
 }
