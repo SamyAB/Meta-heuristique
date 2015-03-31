@@ -1,6 +1,6 @@
 /* Fichier main.h
  * Inclut les structures de données utilisées dans le projet
- * Dernière modification 27-03-2015
+ * Dernière modification 30-03-2015
  * */
 #ifndef MAIN
 #define MAIN 
@@ -8,17 +8,17 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-//Structure d'état
-typedef struct Etat{
-	char e; //état de la clause
-	struct Etat *suivant; //pointeur sur état suivant
-}Etat;
-
-//Structure d'une élément d'une liste chainée d'entiers
+//Structure d'un élément d'une liste chainée d'entiers
 typedef struct Entier{
 	int id;
 	struct Entier *suivant;
 }Entier;
+
+//Structure d'un élément d'une liste chainée de caractères
+/*typeDef struct Char{
+	char c;
+	struct Char suivant;
+}Char;*/
 
 //Structure de Littéraux 
 typedef struct Litteral{
@@ -27,7 +27,9 @@ typedef struct Litteral{
 
 //Structure d'OPEN
 typedef struct Open{
-	Etat *e;
+	int nbClauses;
+	char *e;
+	Entier *chemin;
 	struct Open *suivant;
 }Open;
 

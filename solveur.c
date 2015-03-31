@@ -11,20 +11,13 @@ void largeur()
 {
 	//Déclaration de variables
 	Litteral *tabLitt=NULL;
-	int nbClauses=0,nbLitt=0;
-	Etat *etatInitial=NULL;
+	int nbClauses=0,nbLitt=0,niveau=0;
+	Open *etatInitial=NULL,*etatActuel=NULL;
 	Open *tete=NULL;
+	char typeE='';
 	
 	//Initialisation des données
 	tabLitt=init("test.cnf",&nbClauses,&nbLitt,&etatInitial);
-	
-	//Alocation e la tête de la liste open
-	tete=(Open*)malloc(sizeof(Open));
-	if(tete==NULL)
-	{
-		fprintf(stderr,"erreur lors de l'allocation de la tête de liste open\n");
-		exit(EXIT_FAILURE);
-	}
 	
 	//Ajout de la tete a la liste open
 	AjouterAOpen(&tete,etatInitial);
@@ -32,6 +25,32 @@ void largeur()
 	//Boucle principale du solveur
 	while(tete!=NULL)
 	{
+		//Récupérer l'état a explorer
+		etatActuel=depiler(&tete);
+		
+		//Récupération du type de l'état acutel
+		typeE=typeEtat(etatActuel);
+		
+		//Test si l'état actuel est un état final (SAT)
+		if(typeE=='S')
+		{
+			typeE='';
+			break;
+		}
+		
+		//Test si l'état est faux (UNSAT)
+		if(typeE=='U')
+		{
+			typeE='';
+			continue;
+		}
+		
+		//Génération des états fils et leurs ajouts a la liste OPEN
+		AjouterAOpen(&tete,genererEtat(etatActuel,1,tabLitt,nbLitt));
+		AjouterAOpen(&tete,genererEtat(etatActuel,-1,tabLitt,nbLitt));
+		
+		//Libération de l'espace mémoir occupé par l'état actuel
+		liberer(&etatActuel);
 	}
 	
 }
