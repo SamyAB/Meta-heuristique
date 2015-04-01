@@ -53,6 +53,7 @@ void largeur()
 		
 		//Libération de l'espace mémoir occupé par l'état actuel
 		liberer(&etatActuel);
+
 	}
 	
 }

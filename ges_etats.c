@@ -14,11 +14,11 @@ void afficherChemin(Entier *tete)
 	
 	if(tmp==NULL)
 	{
-		printf("le chemin est vide, état initial\n");
+		printf("Le chemin est vide, état initial\n");
 	}
 	else
 	{
-		printf("le chemin qui a mené a cet état est:\n");
+		printf("\n\nLe chemin qui a mené a cet état est:\n");
 		while(tmp!=NULL)
 		{
 			printf("%d ",tmp->id);
@@ -39,6 +39,7 @@ void afficherEtat(Open *etat)
 	afficherChemin(etat->chemin);
 	
 	//Parcours de l'état
+	printf("États des clauses:\n");
 	for(i=0;i<taille;i++)
 	{
 		printf("la clause %d à l'état: %c\n",i+1,(etat->e)[i]);
@@ -46,23 +47,65 @@ void afficherEtat(Open *etat)
 }
 
 //Ajout a la liste chemin d'un état, cette fonction ajoute au début
-void ajoutChemin(Entier **tete,int val)
+Entier *nouveauChemin(Entier *source,int val)
 {
 	//Déclaration de variables
-	Entier *tmp=NULL;
+	Entier *tmp=NULL,*tmp2=NULL,*parcourt=source,*chemin=NULL;
 	
-	//Allocation du nouvel élément
-	tmp=(Entier*)malloc(sizeof(Entier));
-	if(tmp==NULL)
+	//Allocation de la tête du nouveau chemin
+	chemin=(Entier*)malloc(sizeof(Entier));
+	if(chemin==NULL)
 	{
-		fprintf(stderr,"erreur lors de l'allocation d'un nouvel élément dans le chemin\n");
+		fprintf(stderr,"erreur lors de la création de la tête du nouveau chemin\n");
 		exit(EXIT_FAILURE);
 	}
 	
-	//Afectation des valeurs du nouvel élément et chainage
-	tmp->id=val;
-	tmp->suivant=*tete;
-	*tete=tmp;
+	//Si le chemin source est vide, le chemin est consititué de val seulement
+	if(parcourt==NULL)
+	{
+		chemin->id=val;
+		chemin->suivant=NULL;
+	}
+	else
+	{
+		//Copie du permier élément de la source a la nouvelle tête
+		chemin->id=parcourt->id;
+		chemin->suivant=NULL;
+		parcourt=parcourt->suivant;
+		tmp2=chemin;
+		
+		//Parcourt du reste de la source
+		while(parcourt!=NULL)
+		{
+			//Copie et chainage
+			tmp=(Entier*)malloc(sizeof(Entier));
+			if(tmp==NULL)
+			{
+				fprintf(stderr,"erreur lors de la copie d'un élément de chemin\n");
+				exit(EXIT_FAILURE);
+			}
+			
+			tmp->id=parcourt->id;
+			parcourt=parcourt->suivant;
+			tmp->suivant=NULL;
+			tmp2->suivant=tmp;
+			tmp2=tmp;
+		}
+		
+		//allocation du nouvel élément
+		tmp=(Entier*)malloc(sizeof(Entier));
+		if(tmp==NULL)
+		{
+			fprintf(stderr,"erreur lors de la copie d'un élément de chemin\n");
+			exit(EXIT_FAILURE);
+		}
+		
+		tmp->id=val;
+		tmp->suivant=NULL;
+		tmp2->suivant=tmp;	
+	}
+		
+	return chemin;
 }
 
 //Fonction qui retourne le niveau actuel d'un état 
@@ -81,12 +124,7 @@ int compteurNiveau(Entier *tete)
 	}
 	
 	return compteur;
-}	
-
-/*int hashInt(int nombre)
-{
-	
-}*/
+}
 
 //Fonction d'initialisations des données 
 Litteral* init(char *benchmark,int *nbClauses,int *nbLitt,Open **etatInit)
@@ -106,20 +144,20 @@ Litteral* init(char *benchmark,int *nbClauses,int *nbLitt,Open **etatInit)
 	*etatInit=(Open*)malloc(sizeof(Open));
 	if(*etatInit==NULL)
 	{
-		fprintf(stderr,"erreur lors de l'allocationd e l'état initial\n");
+		fprintf(stderr,"erreur lors de l'allocation de l'état initial\n");
 		exit(EXIT_FAILURE);
 	}
 	
 	//Allocation de la table d'états de clauses de l'état initial
-	(*etatInit)->e=(char*)malloc(*nbClauses*sizeof(char));
+	(*etatInit)->e=(char*)malloc(taille*sizeof(char));
 	if((*etatInit)->e==NULL)
 	{
-		fprintf(stderr,"erreur lors de l'alocation de la table d'états\n");
+		fprintf(stderr,"erreur lors de l'allocation de la table d'états de clauses de l'état initial\n");
 		exit(EXIT_FAILURE);
 	}
 
 	//Initialisation des valeurs d'états de clauses a '0' (0 visite)
-	for(i=0;i<(*nbClauses);i++)
+	for(i=0;i<taille;i++)
 	{
 		(*etatInit)->e[i]='0';
 	}	
@@ -199,50 +237,76 @@ char typeEtat(Open *etat)
 	return type;
 }
 
+//Fonction d'allocation et de copie d'une table d'état de clause
+char* copieTable(char *source)
+{
+	//Déclaration de variables
+	int i=0;
+	char *table=NULL;
+	extern int taille;
+	
+	//Allocation de la table
+	table=(char*)malloc(sizeof(char)*taille);
+	if(table==NULL)
+	{
+		fprintf(stderr,"erreur lors de l'allocation de la table d'état de clauses\n");
+		exit(EXIT_FAILURE);
+	}
+	
+	//Copie des élément de la source a table
+	for(i=0;i<taille;i++)
+	{
+		table[i]=source[i];
+	}
+	
+	return table;
+}
+
 //Fonction de génération d'un état fils selon la variable val
 Open *genererEtat(Open *etatP,int val,Litteral *tabLitt,int nbLitt)
 {
 	//Déclaration de variable
-	int litteral=0,id=0;
+	int litteral=0,clause=0;
 	Open *etat=NULL;
 	extern int taille;
 	char *tableau=NULL;
 	Entier *tmp=NULL;
-	
+	int i=0;
+		
 	//Compter le niveau, et donc le littéral auquel on affecte la valeur
 	litteral=compteurNiveau(etatP->chemin);
 		
 	//Copie de la table d'état de l'état père dans tableau	
-	tableau=strdup(etatP->e);
-	
+	tableau=copieTable(etatP->e);
+		
 	//Affectation des nouveaux états dans la table d'états 
 	tmp=tabLitt[litteral].tete;
 	while(tmp!=NULL)
 	{
-		id=tmp->id;
+		clause=tmp->id;
 		
-		if((id*val)>0)
+		if((clause*val)>0)
 		{
-			tableau[abs(id)]='S';
+			tableau[(abs(clause))-1]='S';
 		}
 		else
 		{
-			switch(tableau[abs(tmp->id)])
+			switch(tableau[(abs(clause))-1])
 			{
 				case '0':
-					tableau[tmp->id]='1';
+					tableau[(abs(clause))-1]='1';
 					break;
 				case '1':
-					tableau[tmp->id]='2';
+					tableau[(abs(clause))-1]='2';
 					break;
 				case '2':
-					tableau[tmp->id]='U';
+					tableau[(abs(clause))-1]='U';
 					break;
 			}
 		}
 		tmp=tmp->suivant;
 	}
-	
+			
 	//Allocation du nouvel état
 	etat=(Open*)malloc(sizeof(Open));
 	if(etat==NULL)
@@ -252,8 +316,8 @@ Open *genererEtat(Open *etatP,int val,Litteral *tabLitt,int nbLitt)
 	}
 	
 	//Affectation des valeurs au nouvel état
-	ajoutChemin(&(etat->chemin),(litteral+1)*val);
-	etat->e=tableau;
+	etat->chemin=nouveauChemin(etatP->chemin,(litteral+1)*val);	
+	etat->e=tableau;	
 	etat->suivant=NULL;
 	
 	return etat;
@@ -268,9 +332,8 @@ void libererEntier(Entier **tete)
 	while(*tete!=NULL)
 	{
 		tmp=(*tete);
-		(*tete)=tmp->suivant;
+		*tete=(*tete)->suivant;
 		free(tmp);
-		*tete=tmp;
 	}
 }
 

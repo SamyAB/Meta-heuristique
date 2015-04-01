@@ -38,7 +38,7 @@ Litteral *ajouterClause(Litteral* tabLitt,int aAjouter,int index)
 	clause=(Entier*) malloc(sizeof(Entier));
 	if(clause==NULL)
 	{
-		fprintf(stderr,"erreur lors de l'allocation d'un élément entier pour la clause %d\n",aAjouter+1);
+		fprintf(stderr,"erreur lors de l'allocation d'un élément entier pour la clause %d\n",aAjouter);
 		exit(EXIT_FAILURE);
 	}
 	
