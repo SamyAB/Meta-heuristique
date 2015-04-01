@@ -6,7 +6,7 @@ void afficherEtat(char *tab,int nbClauses);
 Entier *nouveauChemin(Entier *source,int val);
 int compteurNiveau(Entier *tete);
 Litteral *init(char *benchmark,int *nbClauses,int *nbLitteraux,Open **etatInit);
-void ajouterAOpen(Open **tete,char *etat,int nbClauses);
+void ajouterAOpen(Open **tete,Open **queue,Open *etat);
 Open *depiler(Open **tete);
 char typeEtat(Open *etat);
 char *copieTable(char *source);

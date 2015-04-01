@@ -1,5 +1,5 @@
 /* Fichier de gestion des états 
- * dérnière modification 31/03/2015
+ * dérnière modification 01/04/2015
  * */
  
 #include "main.h"
@@ -170,35 +170,19 @@ Litteral* init(char *benchmark,int *nbClauses,int *nbLitt,Open **etatInit)
 }
 
 //Fonction d'ajout d'état a la liste open, à la fin de celle ci
-void AjouterAOpen(Open **tete,Open *etat)
+void ajouterAOpen(Open **tete,Open **queue,Open *etat)
 {
-	//Déclaration de varaibles
-	Open *tmp=NULL,*tmp2=NULL;
-	
-	//Si la tete est vide
+	etat->suivant=NULL;
 	if(*tete==NULL)
 	{
 		(*tete)=etat;
-		(*tete)->suivant=NULL;
+		(*queue)=etat;
 	}
 	else
 	{
-		//Initialisation des temporaires
-		tmp=(*tete);
-		tmp2=tmp->suivant;
-		
-		//Parcourt de la liste jusqu'à la fin
-		while(tmp2!=NULL)
-		{
-			tmp=tmp->suivant;
-			tmp2=tmp2->suivant;
-		}
-		
-		//Affectation des valeurs du nouvel élément et chainage
-		tmp2=etat;
-		tmp2->suivant=NULL;
-		tmp->suivant=tmp2;
-	}
+		(*queue)->suivant=etat;
+		(*queue)=etat;
+	}	
 }
 
 //Fonction de dépiler état de la liste Open
@@ -275,6 +259,9 @@ Open *genererEtat(Open *etatP,int val,Litteral *tabLitt,int nbLitt)
 		
 	//Compter le niveau, et donc le littéral auquel on affecte la valeur
 	litteral=compteurNiveau(etatP->chemin);
+	
+	//Affichage du niveau
+	printf("Niveau %d\n",litteral);
 		
 	//Copie de la table d'état de l'état père dans tableau	
 	tableau=copieTable(etatP->e);
