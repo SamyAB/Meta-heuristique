@@ -1,5 +1,5 @@
 /* Fichier de gestion des états 
- * dérnière modification 01/04/2015
+ * dérnière modification 04/04/2015
  * */
  
 #include "main.h"
@@ -126,6 +126,21 @@ int compteurNiveau(Entier *tete)
 	return compteur;
 }
 
+//Fonction comptant le nombre de clauses SAT
+int compteurNbClausesSat(char *tab,int nbClauses)
+{
+	//Déclaration de variables
+	int i=0,nbClausesSat=0;
+
+
+	for(i=0;i<nbClauses;i++)
+	{
+		if(tab[i]=='S') nbClausesSat++;
+	}
+	
+	return nbClausesSat;
+}
+
 //Fonction d'initialisations des données 
 Litteral* init(char *benchmark,int *nbClauses,int *nbLitt,Open **etatInit)
 {
@@ -198,6 +213,14 @@ Open *depiler(Open **tete)
 	(*tete)=(*tete)->suivant;
 	
 	return tmp;
+}
+
+//Fonction d'ajout d'un état au début de la liste Open
+void empilerEtat(Open **tete,Open *etat)
+{
+	//
+	etat->suivant=(*tete);
+	(*tete)=etat;
 }
 
 //Fonction de test si l'état en entrée est un état final ou faux
@@ -316,6 +339,7 @@ void libererEntier(Entier **tete)
 	//Déclaration de variables
 	Entier *tmp=NULL;
 	
+	//Parcourt de la liste 
 	while(*tete!=NULL)
 	{
 		tmp=(*tete);
@@ -327,13 +351,172 @@ void libererEntier(Entier **tete)
 //Fonction de libération de l'espace mémoire qu'occupe un état
 void liberer(Open **etat)
 {
+	//Déclaration de variables
 	Open *tmp=(*etat);
 	
+	//Si l'état n'est pas déjà vide
 	if(*etat!=NULL)
 	{
+		//Libération de l'espace mémoir occupé par le chemin
 		libererEntier(&(tmp->chemin));
+		
+		//Libération de la table de caractères d'états de clauses
 		free(tmp->e);
+		
+		//Libération de l'état
 		free(tmp);
+		
+		//Affectation de null a l'état
 		(*etat)=NULL;
 	}
 }
+
+//Fonction de calcule du nombre de visite de clauses (heuristique 2)
+int visite(char *tab,int nbClause)
+{
+	//Déclaration de variables
+	int i=0,visite;
+	
+	for(i=0;i<nbClause;i++)
+	{
+		switch(tab[i])
+		{
+			case '1':
+				visite++;
+				break;
+			case '2':
+				visite+=2;
+				break;
+		}
+	}
+	
+	return visite;
+}
+
+//Fonction de récupération d'état en utilisant h1
+Open *f1(Open **tete,int nbClauses)
+{
+	//Déclaration de variables
+	Open *etat=NULL,*parcourt=*tete,*precedent=NULL,*tmp=NULL;
+	int prio=0,niveau=0,nbClauseSat=0,prioMax=0;
+	
+	//Parcourt de la liste Open
+	while(parcourt!=NULL)
+	{
+		//Récupération du niveau et du nombre de clauses SAT
+		niveau=compteurNiveau(parcourt->chemin);//Fait office de G
+		nbClauseSat=compteurNbClausesSat(parcourt->e,nbClauses);//Fait office de H
+		prio=niveau+nbClauseSat;
+		
+		//Si le niveau + le nombre de clauses sont au niveau max
+		if(prio>=prioMax)
+		{
+			etat=parcourt;
+			precedent=tmp;
+			prioMax=prio;
+		}
+		
+		//Passage a l'élément suivant de la liste Open
+		tmp=parcourt;
+		parcourt=parcourt->suivant;
+	}
+	
+	//Si precedent est null l'élement a retourner est la tete de liste
+	if(precedent==NULL)
+	{
+		(*tete)=(*tete)->suivant;
+	}
+	else
+	{
+		precedent->suivant=etat->suivant;
+	}
+	
+	return etat;
+}
+
+//Fonction de récupération d'état en utilsant h2
+Open *f2(Open **tete,int nbClauses)
+{
+	//Déclaration de variables
+	Open *etat=NULL,*parcourt=(*tete),*tmp=NULL,*precedent=NULL;
+	int prio=0,prioMax=0,niveau=0,nbVisite=0;
+	
+	//Parcourt des états
+	while(parcourt!=NULL)
+	{
+		//Récupération du niveau et du nombre de visite
+		niveau=compteurNiveau(parcourt->chemin);//représente G
+		nbVisite=visite(parcourt->e,nbClauses);//représente H2
+		prio=niveau+nbVisite;
+		
+		//Si le niveau + le nombre de visite est max
+		if(prio>=prioMax)
+		{
+			etat=parcourt;
+			precedent=tmp;
+			prioMax=prio;
+		}
+		
+		//Passage a l'élément suivant de la liste Open
+		tmp=parcourt;
+		parcourt=parcourt->suivant;
+	}
+	
+	//Si precedent est null l'élement a retourner est la tete de liste
+	if(precedent==NULL)
+	{
+		(*tete)=(*tete)->suivant;
+	}
+	else
+	{
+		precedent->suivant=etat->suivant;
+	}
+	
+	return etat;
+}
+
+//Fonction de récupération d'état en utilisant h3
+Open *f3(Open **tete,int nbClauses)
+{
+	//Déclaration de variables
+	Open *etat=NULL,*parcourt=(*tete),*tmp=NULL,*precedent=NULL;
+	int prio=0,prioMax=0,niveau=0,nbVisite=0,nbClauseSat=0;
+	
+	//Parcourt des états
+	while(parcourt!=NULL)
+	{
+		//Récupération du niveau et du nombre de visite
+		niveau=compteurNiveau(parcourt->chemin);//représente G
+		nbVisite=visite(parcourt->e,nbClauses);//représente H2
+		nbClauseSat=compteurNbClausesSat(parcourt->e,nbClauses);//Représente H1
+		/*H3 étant la somme de H1 et H3 */
+		
+		prio=niveau+nbVisite+nbClauseSat;
+		
+		//Si le niveau + le nombre de visite est max
+		if(prio>=prioMax)
+		{
+			etat=parcourt;
+			precedent=tmp;
+			prioMax=prio;
+		}
+		
+		//Passage a l'élément suivant de la liste Open
+		tmp=parcourt;
+		parcourt=parcourt->suivant;
+	}
+	
+	//Si precedent est null l'élement a retourner est la tete de liste
+	if(precedent==NULL)
+	{
+		(*tete)=(*tete)->suivant;
+	}
+	else
+	{
+		precedent->suivant=etat->suivant;
+	}
+	
+	return etat;
+}
+		
+		

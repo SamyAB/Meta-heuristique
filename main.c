@@ -1,6 +1,5 @@
 /* Fichier principal du projet de Méta-heuristique
- * Dérnière modification 28-03-2015
- * Crée par SamyAB
+ * Dernière modification 04-04-2015
  * */
  
 #include "main.h"
@@ -41,11 +40,25 @@ int main(int argc,char** argv)
 			case 3:
 				//Solveur A*
 				printf("quelle heuristique voulez utiliser?\n");
-				printf("1.\n");
-				printf("2.\n");
-				printf("3.\n");
+				printf("1.Heuristique 1\n");
+				printf("2.Heuristique 2\n");
+				printf("3.Heuristique 3\n");
 				scanf("%d",&heuristique);
-				aEtoile(heuristique);
+				switch(heuristique)
+				{
+					case 1:
+						aEtoileH1();
+						break;
+					case 2:
+						aEtoileH2();
+						break;
+					case 3:
+						aEtoileH3();
+						break;
+					default:
+						printf("heuristique non éxistante\n");
+						break;
+				}
 				break;
 			case 4:
 				//Quitter le programme

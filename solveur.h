@@ -3,7 +3,9 @@
 
 void largeur();
 void profondeur();
-void aEtoile(int h);
+void aEtoileH1();
+void aEtoileH2();
+void aEtoileH3();
 
 #endif
 
