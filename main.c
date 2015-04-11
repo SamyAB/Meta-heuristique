@@ -12,7 +12,7 @@ int main(int argc,char** argv)
 	int choix=0,quitter=0;
 	int nbClauses=0,nbLitt=0;
 	int heuristique=0;
-	Litteral *tabLitt=NULL;
+	Litteral *tabLitt=NULL;	
 	
 	//Boucle principale du programme
 	while(!quitter)

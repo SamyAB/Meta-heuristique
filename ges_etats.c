@@ -1,5 +1,5 @@
 /* Fichier de gestion des états 
- * dérnière modification 04/04/2015
+ * dérnière modification 11/04/2015
  * */
  
 #include "main.h"
@@ -148,6 +148,10 @@ Litteral* init(char *benchmark,int *nbClauses,int *nbLitt,Open **etatInit)
 	Litteral *tab=NULL;
 	int i=0;
 	extern int taille;//variable globale taille de table de clauses
+	extern int nbClausesSatMax;//variable globale de nombre max de clauses SAT
+	
+	//Initialisation du nombre max de clauses SAT a 0
+	nbClausesSatMax=0;
 	
 	//Lecteur du fichier de benchmark
 	tab=lectureDeFichier(benchmark,nbClauses,nbLitt);
@@ -273,9 +277,10 @@ char* copieTable(char *source)
 Open *genererEtat(Open *etatP,int val,Litteral *tabLitt,int nbLitt)
 {
 	//Déclaration de variable
-	int litteral=0,clause=0;
+	int litteral=0,clause=0,nbClausesSat=0;
 	Open *etat=NULL;
 	extern int taille;
+	extern int nbClausesSatMax;
 	char *tableau=NULL;
 	Entier *tmp=NULL;
 	int i=0;
@@ -283,9 +288,6 @@ Open *genererEtat(Open *etatP,int val,Litteral *tabLitt,int nbLitt)
 	//Compter le niveau, et donc le littéral auquel on affecte la valeur
 	litteral=compteurNiveau(etatP->chemin);
 	
-	//Affichage du niveau
-	printf("Niveau %d\n",litteral);
-		
 	//Copie de la table d'état de l'état père dans tableau	
 	tableau=copieTable(etatP->e);
 		
@@ -298,6 +300,7 @@ Open *genererEtat(Open *etatP,int val,Litteral *tabLitt,int nbLitt)
 		if((clause*val)>0)
 		{
 			tableau[(abs(clause))-1]='S';
+			nbClausesSat++;
 		}
 		else
 		{
@@ -311,6 +314,9 @@ Open *genererEtat(Open *etatP,int val,Litteral *tabLitt,int nbLitt)
 					break;
 				case '2':
 					tableau[(abs(clause))-1]='U';
+					break;
+				case 'S':
+					nbClausesSat++;
 					break;
 			}
 		}
@@ -329,6 +335,12 @@ Open *genererEtat(Open *etatP,int val,Litteral *tabLitt,int nbLitt)
 	etat->chemin=nouveauChemin(etatP->chemin,(litteral+1)*val);	
 	etat->e=tableau;	
 	etat->suivant=NULL;
+	
+	//Comparer le nombre de clauses SAT du nouvle état avec le nombre max de clauses SAT
+	if(nbClausesSat>nbClausesSatMax)
+	{
+		nbClausesSatMax=nbClausesSat;
+	}
 	
 	return etat;
 }

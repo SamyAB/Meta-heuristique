@@ -8,9 +8,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+//Macros
+#define RAM_MAX 3000000 //En KO
+#define TEMPS_MAX 3600 //temps maximum : En secondes
+
 //Structure d'un élément d'une liste chainée d'entiers
 typedef struct Entier{
-	int id;
+	short id;
 	struct Entier *suivant;
 }Entier;
 
@@ -28,6 +32,7 @@ typedef struct Open{
 
 //Déclarationde la taille des tables e de la structure Open
 int taille;
+int nbClausesSatMax;
 
 #endif
 
