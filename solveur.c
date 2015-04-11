@@ -9,7 +9,7 @@
 #include <sys/resource.h>
 
 //Fonction de l'algorithme solveur SAT en largeur
-void largeur()
+void largeur(char *chemin)
 {
 	//Déclaration de variables
 	Litteral *tabLitt=NULL;
@@ -23,7 +23,7 @@ void largeur()
 	clock_t debut=clock();
 	
 	//Initialisation des données
-	tabLitt=init("test.cnf",&nbClauses,&nbLitt,&etatInitial);
+	tabLitt=init(chemin,&nbClauses,&nbLitt,&etatInitial);
 	
 	
 	//Ajout de la tete a la liste open
@@ -99,7 +99,7 @@ void largeur()
 }
 
 //Fonction de l'algorithem solveur SAT en profondeur
-void profondeur()
+void profondeur(char *chemin)
 {
 	//Déclaration de variables
 	Litteral *tabLitt=NULL;
@@ -111,7 +111,7 @@ void profondeur()
 	clock_t debut=clock();
 	
 	//Initialisation des données
-	tabLitt=init("test.cnf",&nbClauses,&nbLitt,&etatInitial);
+	tabLitt=init(chemin,&nbClauses,&nbLitt,&etatInitial);
 	
 	//Ajout de la tete a la liste open
 	empilerEtat(&tete,etatInitial);
@@ -182,7 +182,7 @@ void profondeur()
 }
 
 //Fonction de de l'algorithme de solveur A* avec l'heuristique 1
-void aEtoileH1()
+void aEtoileH1(char *chemin)
 {
 	//Déclaration de variables
 	Litteral *tabLitt=NULL;
@@ -193,7 +193,7 @@ void aEtoileH1()
 	clock_t debut=clock();
 	
 	//Initialisation des données
-	tabLitt=init("test.cnf",&nbClauses,&nbLitt,&etatInitial);
+	tabLitt=init(chemin,&nbClauses,&nbLitt,&etatInitial);
 	
 	//Ajout de l'état intial a la liste Open
 	empilerEtat(&tete,etatInitial);
@@ -263,7 +263,7 @@ void aEtoileH1()
 }
 	
 //Fonction de de l'algorithme de solveur A* avec l'heuristique 2
-void aEtoileH2()
+void aEtoileH2(char *chemin)
 {
 	//Déclaration de variables
 	Litteral *tabLitt=NULL;
@@ -274,7 +274,7 @@ void aEtoileH2()
 	clock_t debut=clock();
 	
 	//Initialisation des données
-	tabLitt=init("test.cnf",&nbClauses,&nbLitt,&etatInitial);
+	tabLitt=init(chemin,&nbClauses,&nbLitt,&etatInitial);
 	
 	//Ajout de l'état intial a la liste Open
 	empilerEtat(&tete,etatInitial);
@@ -345,7 +345,7 @@ void aEtoileH2()
 }
 
 //Fonction de de l'algorithme de solveur A* avec l'heuristique 3
-void aEtoileH3()
+void aEtoileH3(char *chemin)
 {
 	//Déclaration de variables
 	Litteral *tabLitt=NULL;
@@ -356,7 +356,7 @@ void aEtoileH3()
 	clock_t debut=clock();
 	
 	//Initialisation des données
-	tabLitt=init("test.cnf",&nbClauses,&nbLitt,&etatInitial);
+	tabLitt=init(chemin,&nbClauses,&nbLitt,&etatInitial);
 	
 	//Ajout de l'état intial a la liste Open
 	empilerEtat(&tete,etatInitial);

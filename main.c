@@ -31,11 +31,11 @@ int main(int argc,char** argv)
 		{
 			case 1:
 				//Solveur largeur d'abord
-				largeur();
+				largeur(argv[1]);
 				break;
 			case 2:
 				//Solveur profondeur d'abord
-				profondeur();
+				profondeur(argv[1]);
 				break;
 			case 3:
 				//Solveur A*
@@ -47,13 +47,13 @@ int main(int argc,char** argv)
 				switch(heuristique)
 				{
 					case 1:
-						aEtoileH1();
+						aEtoileH1(argv[1]);
 						break;
 					case 2:
-						aEtoileH2();
+						aEtoileH2(argv[1]);
 						break;
 					case 3:
-						aEtoileH3();
+						aEtoileH3(argv[1]);
 						break;
 					default:
 						printf("heuristique non éxistante\n");

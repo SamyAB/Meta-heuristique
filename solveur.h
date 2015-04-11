@@ -1,11 +1,11 @@
 #ifndef SOLVEUR
 #define SOLVEUR
 
-void largeur();
-void profondeur();
-void aEtoileH1();
-void aEtoileH2();
-void aEtoileH3();
+void largeur(char *chemin);
+void profondeur(char *chemin);
+void aEtoileH1(char *chemin);
+void aEtoileH2(char *chemin);
+void aEtoileH3(char *chemin);
 
 #endif
 
