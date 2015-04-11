@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 //Macros
-#define RAM_MAX 3000000 //En KO
+#define RAM_MAX 3200000 //En KO
 #define TEMPS_MAX 3600 //temps maximum : En secondes
 
 //Structure d'un élément d'une liste chainée d'entiers
@@ -27,6 +27,8 @@ typedef struct Litteral{
 typedef struct Open{
 	char *e;
 	Entier *chemin;
+	short nbClausesSat;
+	short nbVisites;
 	struct Open *suivant;
 }Open;
 

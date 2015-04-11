@@ -126,21 +126,6 @@ int compteurNiveau(Entier *tete)
 	return compteur;
 }
 
-//Fonction comptant le nombre de clauses SAT
-int compteurNbClausesSat(char *tab,int nbClauses)
-{
-	//Déclaration de variables
-	int i=0,nbClausesSat=0;
-
-
-	for(i=0;i<nbClauses;i++)
-	{
-		if(tab[i]=='S') nbClausesSat++;
-	}
-	
-	return nbClausesSat;
-}
-
 //Fonction d'initialisations des données 
 Litteral* init(char *benchmark,int *nbClauses,int *nbLitt,Open **etatInit)
 {
@@ -184,6 +169,8 @@ Litteral* init(char *benchmark,int *nbClauses,int *nbLitt,Open **etatInit)
 	//Initialisation du chemin qui a mené a l'état
 	//l'état initial ne vient de nulle part
 	(*etatInit)->chemin=NULL;
+	(*etatInit)->nbClausesSat=0;
+	(*etatInit)->nbVisites=0;
 	
 	return tab;
 }
@@ -222,7 +209,6 @@ Open *depiler(Open **tete)
 //Fonction d'ajout d'un état au début de la liste Open
 void empilerEtat(Open **tete,Open *etat)
 {
-	//
 	etat->suivant=(*tete);
 	(*tete)=etat;
 }
@@ -277,7 +263,7 @@ char* copieTable(char *source)
 Open *genererEtat(Open *etatP,int val,Litteral *tabLitt,int nbLitt)
 {
 	//Déclaration de variable
-	int litteral=0,clause=0,nbClausesSat=0;
+	int litteral=0,clause=0,nbClausesSat=0,nbVisites=0;
 	Open *etat=NULL;
 	extern int taille;
 	extern int nbClausesSatMax;
@@ -308,9 +294,11 @@ Open *genererEtat(Open *etatP,int val,Litteral *tabLitt,int nbLitt)
 			{
 				case '0':
 					tableau[(abs(clause))-1]='1';
+					nbVisites++;
 					break;
 				case '1':
 					tableau[(abs(clause))-1]='2';
+					nbVisites++;
 					break;
 				case '2':
 					tableau[(abs(clause))-1]='U';
@@ -334,6 +322,8 @@ Open *genererEtat(Open *etatP,int val,Litteral *tabLitt,int nbLitt)
 	//Affectation des valeurs au nouvel état
 	etat->chemin=nouveauChemin(etatP->chemin,(litteral+1)*val);	
 	etat->e=tableau;	
+	etat->nbClausesSat=nbClausesSat;
+	etat->nbVisites=nbVisites;
 	etat->suivant=NULL;
 	
 	//Comparer le nombre de clauses SAT du nouvle état avec le nombre max de clauses SAT
@@ -383,28 +373,6 @@ void liberer(Open **etat)
 	}
 }
 
-//Fonction de calcule du nombre de visite de clauses (heuristique 2)
-int visite(char *tab,int nbClause)
-{
-	//Déclaration de variables
-	int i=0,visite;
-	
-	for(i=0;i<nbClause;i++)
-	{
-		switch(tab[i])
-		{
-			case '1':
-				visite++;
-				break;
-			case '2':
-				visite+=2;
-				break;
-		}
-	}
-	
-	return visite;
-}
-
 //Fonction de récupération d'état en utilisant h1
 Open *f1(Open **tete,int nbClauses)
 {
@@ -417,7 +385,7 @@ Open *f1(Open **tete,int nbClauses)
 	{
 		//Récupération du niveau et du nombre de clauses SAT
 		niveau=compteurNiveau(parcourt->chemin);//Fait office de G
-		nbClauseSat=compteurNbClausesSat(parcourt->e,nbClauses);//Fait office de H
+		nbClauseSat=parcourt->nbClausesSat;//Fait office de H
 		prio=niveau+nbClauseSat;
 		
 		//Si le niveau + le nombre de clauses sont au niveau max
@@ -458,7 +426,7 @@ Open *f2(Open **tete,int nbClauses)
 	{
 		//Récupération du niveau et du nombre de visite
 		niveau=compteurNiveau(parcourt->chemin);//représente G
-		nbVisite=visite(parcourt->e,nbClauses);//représente H2
+		nbVisite=parcourt->nbVisites;//représente H2
 		prio=niveau+nbVisite;
 		
 		//Si le niveau + le nombre de visite est max
@@ -499,8 +467,8 @@ Open *f3(Open **tete,int nbClauses)
 	{
 		//Récupération du niveau et du nombre de visite
 		niveau=compteurNiveau(parcourt->chemin);//représente G
-		nbVisite=visite(parcourt->e,nbClauses);//représente H2
-		nbClauseSat=compteurNbClausesSat(parcourt->e,nbClauses);//Représente H1
+		nbVisite=parcourt->nbVisites;//représente H2
+		nbClauseSat=parcourt->nbClausesSat;//Représente H1
 		/*H3 étant la somme de H1 et H3 */
 		
 		prio=niveau+nbVisite+nbClauseSat;

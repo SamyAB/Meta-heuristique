@@ -71,7 +71,10 @@ void largeur(char *chemin)
 			printf("La taille maximal de la liste open est %d\n",tailleMaxListOpen);
 			printf("Le niveau maximum atteint est %d\n",compteurNiveau(etatActuel->chemin));
 			printf("Le temps passé est %lf\n",((double)(clock()-debut)/CLOCKS_PER_SEC));		
-			exit(EXIT_SUCCESS);
+			
+			//Metre l'état à S pour ne pas dire que la formule est UNSAT
+			typeE='S';
+			break;
 		}
 		
 		//Génération des états fils et leurs ajouts a la liste OPEN
@@ -141,6 +144,7 @@ void profondeur(char *chemin)
 		//Test si l'état est faux (UNSAT)
 		if(typeE=='U')
 		{
+			nbEtatEchec++;
 			typeE=' ';
 			liberer(&etatActuel);
 			continue;
@@ -155,7 +159,10 @@ void profondeur(char *chemin)
 			printf("Le nombre maximum de clauses SAT est %d/%d\n",nbClausesSatMax,nbClauses);
 			printf("La taille maximal de la liste open est %d\n",tailleMaxListOpen);
 			printf("Le temps passé est %lf\n",((double)(clock()-debut)/CLOCKS_PER_SEC));		
-			exit(EXIT_SUCCESS);
+			
+			//Metre l'état à S pour ne pas dire que la formule est UNSAT
+			typeE='S';
+			break;
 		}
 		
 		//Génération des états fils et leurs ajouts a la liste OPEN
@@ -223,6 +230,7 @@ void aEtoileH1(char *chemin)
 		//Test si l'état est faux (UNSAT)
 		if(typeE=='U')
 		{
+			nbEtatEchec++;
 			liberer(&etatActuel);
 			typeE=' ';
 			continue;
@@ -237,7 +245,10 @@ void aEtoileH1(char *chemin)
 			printf("Le nombre maximum de clauses SAT est %d/%d\n",nbClausesSatMax,nbClauses);
 			printf("La taille maximal de la liste open est %d\n",tailleMaxListOpen);
 			printf("Le temps passé est %lf\n",((double)(clock()-debut)/CLOCKS_PER_SEC));		
-			exit(EXIT_SUCCESS);
+			
+			//Metre l'état à S pour ne pas dire que la formule est UNSAT
+			typeE='S';
+			break;
 		}
 		
 		//Génération des états fils et leurs ajouts a la liste OPEN
@@ -292,7 +303,7 @@ void aEtoileH2(char *chemin)
 		//Test si l'état actuel est un état final (SAT)
 		if(typeE=='S')
 		{
-			typeE=' ';
+			typeE='S';
 			printf("La formule est SAT\n");
 			printf("Le nombre d'états générés est %d\n",nbEtatGenere);
 			printf("Le nombre d'états d'échec est %d\n",nbEtatEchec);
@@ -305,6 +316,7 @@ void aEtoileH2(char *chemin)
 		//Test si l'état est faux (UNSAT)
 		if(typeE=='U')
 		{
+			nbEtatEchec++;
 			typeE=' ';
 			liberer(&etatActuel);
 			continue;
@@ -319,7 +331,10 @@ void aEtoileH2(char *chemin)
 			printf("Le nombre maximum de clauses SAT est %d/%d\n",nbClausesSatMax,nbClauses);
 			printf("La taille maximal de la liste open est %d\n",tailleMaxListOpen);
 			printf("Le temps passé est %lf\n",((double)(clock()-debut)/CLOCKS_PER_SEC));		
-			exit(EXIT_SUCCESS);
+			
+			//Metre l'état à S pour ne pas dire que la formule est UNSAT
+			typeE='S';
+			break;
 		}
 		
 		//Génération des états fils et leurs ajouts a la liste OPEN
@@ -374,7 +389,7 @@ void aEtoileH3(char *chemin)
 		//Test si l'état actuel est un état final (SAT)
 		if(typeE=='S')
 		{
-			typeE=' ';
+			typeE='S';
 			printf("La formule est SAT\n");
 			printf("Le nombre d'états générés est %d\n",nbEtatGenere);
 			printf("Le nombre d'états d'échec est %d\n",nbEtatEchec);
@@ -402,7 +417,10 @@ void aEtoileH3(char *chemin)
 			printf("Le nombre maximum de clauses SAT est %d/%d\n",nbClausesSatMax,nbClauses);
 			printf("La taille maximal de la liste open est %d\n",tailleMaxListOpen);
 			printf("Le temps passé est %lf\n",((double)(clock()-debut)/CLOCKS_PER_SEC));		
-			exit(EXIT_SUCCESS);
+			
+			//Metre l'état à S pour ne pas dire que la formule est UNSAT
+			typeE='S';
+			break;
 		}
 		
 		//Génération des états fils et leurs ajouts a la liste OPEN
